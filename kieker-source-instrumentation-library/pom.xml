@@ -107,7 +107,7 @@
     <dependency>
       <groupId>com.github.javaparser</groupId>
       <artifactId>javaparser-core</artifactId>
-      <version>3.24.7</version>
+      <version>3.24.9</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -130,13 +130,13 @@
     <dependency>
       <groupId>de.dagere.kopeme</groupId>
       <artifactId>kopeme-core</artifactId>
-      <version>1.1.14</version>
+      <version>1.2.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>4.8.1</version>
+      <version>4.10.0</version>
       <scope>test</scope>
     </dependency>
 
