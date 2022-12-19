@@ -31,6 +31,9 @@ public class InstrumentationConfigMixin {
 
    @Option(names = { "-excludedPatterns", "--excludedPatterns" }, description = "Method patterns that should be excluded from instrumentation")
    private Set<String> excludedPatterns;
+   
+   @Option(names = { "-strictMode", "--strictMode" }, description = "Whether strict mode should be used")
+   private boolean strictMode = false;
 
    public void setExtractMethod(final boolean extractMethod) {
       this.extractMethod = extractMethod;
@@ -102,5 +105,13 @@ public class InstrumentationConfigMixin {
 
    public void setExcludedPatterns(final Set<String> excludedPatterns) {
       this.excludedPatterns = excludedPatterns;
+   }
+   
+   public boolean isStrictMode() {
+      return strictMode;
+   }
+   
+   public void setStrictMode(boolean strictMode) {
+      this.strictMode = strictMode;
    }
 }

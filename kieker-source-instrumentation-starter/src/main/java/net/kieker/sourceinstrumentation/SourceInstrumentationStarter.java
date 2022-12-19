@@ -31,7 +31,7 @@ public class SourceInstrumentationStarter implements Callable<Integer> {
       final InstrumentationConfiguration configuration = new InstrumentationConfiguration(instrumentationConfigMixin.getUsedRecord(), instrumentationConfigMixin.isAggregate(),
             instrumentationConfigMixin.isCreateDefaultConstructor(),
             instrumentationConfigMixin.isEnableAdaptiveMonitoring(), includedPatterns, excludedPattern,
-            !instrumentationConfigMixin.isDisableDeactivation(), instrumentationConfigMixin.getAggregationCount(), instrumentationConfigMixin.isExtractMethod());
+            !instrumentationConfigMixin.isDisableDeactivation(), instrumentationConfigMixin.getAggregationCount(), instrumentationConfigMixin.isExtractMethod(), instrumentationConfigMixin.isStrictMode());
 
       final InstrumentKiekerSource sourceInstrumenter = new InstrumentKiekerSource(configuration);
       sourceInstrumenter.instrumentProject(projectFolder);
