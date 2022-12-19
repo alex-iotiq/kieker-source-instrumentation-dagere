@@ -62,6 +62,12 @@ public class TypeInstrumenter {
    public boolean handleTypeDeclaration(final TypeDeclaration<?> type, final String packageName) throws IOException {
       if (type != null) {
          final String name = packageName + type.getNameAsString();
+         
+         if (type instanceof ClassOrInterfaceDeclaration && configuration.isStrictMode()) {
+            BlockStmt staticInitializer = type.addStaticInitializer();
+            staticInitializer.addStatement("android.os.StrictMode.ThreadPolicy policy = new android.os.StrictMode.ThreadPolicy.Builder().permitAll().build();");
+            staticInitializer.addStatement("android.os.StrictMode.setThreadPolicy(policy);");
+         }
 
          boolean fileContainsChange = handleChildren(type, name);
 

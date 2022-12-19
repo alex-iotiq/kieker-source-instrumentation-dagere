@@ -23,6 +23,7 @@ public class InstrumentationConfiguration {
    private final boolean enableDeactivation;
    private final boolean createDefaultConstructor;
    private final boolean enableAdaptiveMonitoring;
+   private final boolean strictMode;
    private final SignatureMatchChecker checker;
    private final boolean extractMethod;
 
@@ -46,6 +47,7 @@ public class InstrumentationConfiguration {
       }
 
       this.createDefaultConstructor = true;
+      this.strictMode = false;
       this.samplingCount = samplingCount;
       
       Set<String> excludedPatterns = new HashSet<String>();
@@ -72,6 +74,7 @@ public class InstrumentationConfiguration {
       }
       Set<String> excludedPatterns = new HashSet<String>();
       this.samplingCount = samplingCount;
+      this.strictMode = false;
 
       checker = new SignatureMatchChecker(includedPatterns, excludedPatterns);
       
@@ -80,7 +83,8 @@ public class InstrumentationConfiguration {
 
    public InstrumentationConfiguration(final AllowedKiekerRecord usedRecord, final boolean sample,
          final boolean createDefaultConstructor, final boolean enableAdaptiveMonitoring,
-         final Set<String> includedPatterns, final Set<String> excludedPatterns, final boolean enableDecativation, final int samplingCount, final boolean extractMethod) {
+         final Set<String> includedPatterns, final Set<String> excludedPatterns, final boolean enableDecativation, final int samplingCount, final boolean extractMethod,
+         boolean strictMode) {
       this.usedRecord = usedRecord;
       this.aggregate = sample;
       this.createDefaultConstructor = createDefaultConstructor;
@@ -95,6 +99,7 @@ public class InstrumentationConfiguration {
          this.extractMethod = extractMethod;
       }
       this.samplingCount = samplingCount;
+      this.strictMode = strictMode;
       
       checker = new SignatureMatchChecker(includedPatterns, excludedPatterns);
 
@@ -136,6 +141,10 @@ public class InstrumentationConfiguration {
 
    public boolean isExtractMethod() {
       return extractMethod;
+   }
+   
+   public boolean isStrictMode() {
+      return strictMode;
    }
 
    public BlockBuilder getBlockBuilder() {
