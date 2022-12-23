@@ -17,6 +17,7 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.EnumDeclaration;
+import com.github.javaparser.ast.body.InitializerDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
@@ -24,6 +25,7 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
 import net.kieker.sourceinstrumentation.InstrumentationConfiguration;
 import net.kieker.sourceinstrumentation.InstrumentationConstants;
@@ -62,13 +64,6 @@ public class TypeInstrumenter {
    public boolean handleTypeDeclaration(final TypeDeclaration<?> type, final String packageName) throws IOException {
       if (type != null) {
          final String name = packageName + type.getNameAsString();
-         
-         if (type instanceof ClassOrInterfaceDeclaration && configuration.isStrictMode()) {
-            BlockStmt staticInitializer = type.addStaticInitializer();
-            staticInitializer.addStatement("android.os.StrictMode.ThreadPolicy policy = new android.os.StrictMode.ThreadPolicy.Builder().permitAll().build();");
-            staticInitializer.addStatement("android.os.StrictMode.setThreadPolicy(policy);");
-         }
-
          boolean fileContainsChange = handleChildren(type, name);
 
          if (fileContainsChange) {
@@ -81,12 +76,20 @@ public class TypeInstrumenter {
                   } else {
                      addFields(type, type);
                   }
+                  if (configuration.isStrictMode()) {
+                     addAndroidStrictMode(type);
+                  }
                } else {
                   ClassOrInterfaceDeclaration kiekerValueSubclazz = getValueSubclass(type);
                   addFields(kiekerValueSubclazz, type);
                }
             } else {
                addFields(type, type);
+               if (type instanceof ClassOrInterfaceDeclaration) {
+                  if (configuration.isStrictMode()) {
+                     addAndroidStrictMode(type);
+                  }
+               }
             }
 
             return true;
@@ -126,6 +129,26 @@ public class TypeInstrumenter {
       }
    }
 
+   private void addAndroidStrictMode(TypeDeclaration<?> type) {
+      ClassOrInterfaceDeclaration declaration = (ClassOrInterfaceDeclaration) type;
+      if (isExtendedWith(declaration, "Application")) {
+         BlockStmt staticInitializer = new BlockStmt();
+         staticInitializer.addStatement("android.os.StrictMode.ThreadPolicy policy = new android.os.StrictMode.ThreadPolicy.Builder().permitAll().build();");
+         staticInitializer.addStatement("android.os.StrictMode.setThreadPolicy(policy);");
+         InitializerDeclaration staticInitializerDeclaration = new InitializerDeclaration(true, staticInitializer);
+         type.getMembers().addFirst(staticInitializerDeclaration);
+      }
+   }
+
+   private Boolean isExtendedWith(ClassOrInterfaceDeclaration clazz, String extendsName) {
+      for (ClassOrInterfaceType type : clazz.getExtendedTypes()) {
+         if (type.getNameAsString().equals(extendsName)) {
+            return true;
+         }
+      }
+      return false;
+   }
+   
    private boolean handleChildren(final TypeDeclaration<?> clazz, final String name) {
       List<MethodDeclaration> methodsToAdd = new LinkedList<>();
       boolean constructorFound = false;
